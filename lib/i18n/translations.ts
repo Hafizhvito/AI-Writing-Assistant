@@ -31,13 +31,13 @@ const en = {
     wordsSelected: "{{n}} {{unit}} selected",
   },
   editor: {
-    placeholder: "Start writing, or press ⌘K for commands...",
+    placeholder: "Start writing...",
     ariaLabel: "Document editor",
   },
   sidebar: {
     drafts: "Drafts",
     autoSaved: "Auto-saved",
-    emptySnapshots: "Press ⌘S to save a snapshot",
+    emptySnapshots: "No snapshots saved yet",
     expand: "Expand sidebar",
     collapse: "Collapse sidebar",
     deleteSnapshot: 'Delete snapshot "{{title}}"',
@@ -195,13 +195,13 @@ const id: typeof en = {
     wordsSelected: "{{n}} {{unit}} dipilih",
   },
   editor: {
-    placeholder: "Mulai menulis, atau tekan ⌘K untuk perintah...",
+    placeholder: "Mulai menulis...",
     ariaLabel: "Editor dokumen",
   },
   sidebar: {
     drafts: "Draf",
     autoSaved: "Tersimpan otomatis",
-    emptySnapshots: "Tekan ⌘S untuk simpan snapshot",
+    emptySnapshots: "Belum ada snapshot tersimpan",
     expand: "Buka sidebar",
     collapse: "Tutup sidebar",
     deleteSnapshot: 'Hapus snapshot "{{title}}"',

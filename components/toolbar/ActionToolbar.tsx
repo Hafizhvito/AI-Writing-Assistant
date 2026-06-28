@@ -22,16 +22,15 @@ interface ActionConfig {
   action: AiAction;
   labelKey: string;
   icon: React.ElementType;
-  shortcut: string;
 }
 
 const ACTION_DEFS: ActionConfig[] = [
-  { action: "improve", labelKey: "actions.improve", icon: Wand2, shortcut: "⌘I" },
-  { action: "grammar", labelKey: "actions.grammar", icon: SpellCheck, shortcut: "⌘G" },
-  { action: "summarize", labelKey: "actions.summarize", icon: FileText, shortcut: "⌘J" },
-  { action: "expand", labelKey: "actions.expand", icon: Maximize2, shortcut: "⌘E" },
-  { action: "rewrite", labelKey: "actions.rewrite", icon: RefreshCw, shortcut: "⌘R" },
-  { action: "rephrase", labelKey: "actions.rephrase", icon: Repeat2, shortcut: "" },
+  { action: "improve", labelKey: "actions.improve", icon: Wand2 },
+  { action: "grammar", labelKey: "actions.grammar", icon: SpellCheck },
+  { action: "summarize", labelKey: "actions.summarize", icon: FileText },
+  { action: "expand", labelKey: "actions.expand", icon: Maximize2 },
+  { action: "rewrite", labelKey: "actions.rewrite", icon: RefreshCw },
+  { action: "rephrase", labelKey: "actions.rephrase", icon: Repeat2 },
 ];
 
 interface ActionToolbarProps {
@@ -46,11 +45,10 @@ export function ActionToolbar({ hasSelection }: ActionToolbarProps) {
 
   const actions = useMemo(
     () =>
-      ACTION_DEFS.map(({ action, labelKey, icon, shortcut }) => ({
+      ACTION_DEFS.map(({ action, labelKey, icon }) => ({
         action,
         label: t(labelKey),
         icon,
-        shortcut,
       })),
     [t]
   );
@@ -83,19 +81,15 @@ export function ActionToolbar({ hasSelection }: ActionToolbarProps) {
           role="toolbar"
           aria-label={t("a11y.aiActions")}
         >
-          {actions.map(({ action, label, icon: Icon, shortcut }) => {
+          {actions.map(({ action, label, icon: Icon }) => {
             const actionLoading = isLoading && loadingAction === action;
 
             return (
-              <Tooltip
-                key={action}
-                hint={label}
-                shortcut={shortcut || undefined}
-              >
+              <Tooltip key={action} hint={label}>
                 <button
                   type="button"
                   disabled={isLoading}
-                  aria-label={shortcut ? `${label} (${shortcut})` : label}
+                  aria-label={label}
                   aria-busy={actionLoading}
                   onClick={() => runAiAction(action)}
                   className={cn(

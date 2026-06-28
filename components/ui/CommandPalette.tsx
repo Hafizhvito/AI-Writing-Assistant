@@ -27,7 +27,6 @@ interface Command {
   label: string;
   group: GroupKey;
   keywords: string[];
-  shortcut?: string;
   icon: LucideIcon;
 }
 
@@ -75,7 +74,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("actions.improveFull"),
         group: "ai",
         keywords: ["ai", "enhance", "better", "polish", "fix", "improve", "writing"],
-        shortcut: "⌘I",
         icon: Wand2,
       },
       {
@@ -83,7 +81,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("actions.grammarFull"),
         group: "ai",
         keywords: ["spelling", "punctuation", "errors", "check", "grammar"],
-        shortcut: "⌘G",
         icon: SpellCheck2,
       },
       {
@@ -91,7 +88,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("actions.summarize"),
         group: "ai",
         keywords: ["brief", "short", "summary", "condense", "shorten", "summarize"],
-        shortcut: "⌘J",
         icon: AlignLeft,
       },
       {
@@ -99,7 +95,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("actions.expand"),
         group: "ai",
         keywords: ["lengthen", "elaborate", "detail", "more", "longer", "expand"],
-        shortcut: "⌘E",
         icon: ChevronsUpDown,
       },
       {
@@ -107,7 +102,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("actions.rewrite"),
         group: "ai",
         keywords: ["rework", "redo", "tone", "transform", "regenerate", "rewrite"],
-        shortcut: "⌘R",
         icon: RefreshCw,
       },
       {
@@ -122,7 +116,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("commandPalette.saveSnapshot"),
         group: "document",
         keywords: ["save", "backup", "version", "history", "preserve", "snapshot"],
-        shortcut: "⌘S",
         icon: Save,
       },
       {
@@ -137,7 +130,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("commandPalette.toggleTheme"),
         group: "view",
         keywords: ["dark", "light", "mode", "color", "appearance", "theme"],
-        shortcut: "⌘D",
         icon: SunMoon,
       },
       {
@@ -152,7 +144,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("commandPalette.keyboardShortcuts"),
         group: "view",
         keywords: ["help", "keys", "hotkeys", "cheatsheet", "reference", "shortcuts"],
-        shortcut: "?",
         icon: Keyboard,
       },
       {
@@ -160,7 +151,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         label: t("commandPalette.closePanel"),
         group: "navigation",
         keywords: ["close", "dismiss", "hide", "panel", "exit"],
-        shortcut: "Esc",
         icon: X,
       },
     ],
@@ -298,9 +288,6 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
               setActiveIdx(0);
             }}
           />
-          <kbd className="hidden items-center gap-1 rounded border border-[var(--border-default)] bg-[var(--bg-overlay)] px-1.5 py-0.5 text-xs font-medium text-[var(--text-muted)] sm:inline-flex">
-            Esc
-          </kbd>
         </div>
 
         {/* Results */}
@@ -343,24 +330,12 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
                         )}
                       />
                       <span className="flex-1">{cmd.label}</span>
-                      {cmd.shortcut && (
-                        <kbd className="inline-flex items-center gap-0.5 rounded border border-[var(--border-default)] bg-[var(--bg-overlay)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--text-muted)]">
-                          {cmd.shortcut}
-                        </kbd>
-                      )}
                     </button>
                   );
                 })}
               </div>
             ))
           )}
-        </div>
-
-        {/* Footer hints */}
-        <div className="flex items-center gap-4 border-t border-[var(--border-default)] px-4 py-2 text-[11px] text-[var(--text-muted)]">
-          <span>{t("commandPalette.footerNav")}</span>
-          <span>{t("commandPalette.footerEnter")}</span>
-          <span>{t("commandPalette.footerEsc")}</span>
         </div>
       </div>
     </div>
