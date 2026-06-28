@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { X, Eye, EyeOff, AlertTriangle, RefreshCw } from "lucide-react";
 import { useEditorStore } from "@/store/editorStore";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ANIMATIONS, REDUCED_MOTION_TRANSITION } from "@/lib/animations";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +11,7 @@ import DiffViewer from "@/components/editor/DiffViewer";
 import { cn } from "@/lib/utils";
 
 export function ResultPanel() {
+  const { t } = useTranslation();
   const {
     aiResult,
     aiError,
@@ -39,7 +41,7 @@ export function ResultPanel() {
       transition={transition}
       style={{ width: 340, minWidth: 340 }}
       className="flex flex-col h-full border-l border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden"
-      aria-label="AI Result panel"
+      aria-label={t("result.panelLabel")}
     >
       {/* Header */}
       <div
@@ -50,11 +52,11 @@ export function ResultPanel() {
           className="text-sm font-semibold"
           style={{ color: "var(--text-primary)" }}
         >
-          AI Result
+          {t("result.title")}
         </h2>
         <button
           type="button"
-          aria-label="Close AI Result panel"
+          aria-label={t("result.closePanel")}
           onClick={() => setActivePanel(null)}
           className={cn(
             "rounded-md p-1 transition-colors duration-150",
@@ -97,7 +99,7 @@ export function ResultPanel() {
                 className="text-xs px-2.5 py-1.5 h-auto gap-1.5"
               >
                 <RefreshCw size={12} aria-hidden />
-                Retry
+                {t("common.retry")}
               </Button>
             )}
           </div>
@@ -118,7 +120,7 @@ export function ResultPanel() {
               aria-pressed={showDiff}
             >
               {showDiff ? <EyeOff size={13} aria-hidden /> : <Eye size={13} aria-hidden />}
-              {showDiff ? "Hide changes" : "Show changes"}
+              {showDiff ? t("result.hideChanges") : t("result.showChanges")}
             </button>
 
             {showDiff && aiResult ? (
@@ -151,14 +153,14 @@ export function ResultPanel() {
             onClick={applyResult}
             disabled={!aiResult}
           >
-            Replace
+            {t("common.replace")}
           </Button>
           <Button
             variant="ghost"
             className="flex-1"
             onClick={discardResult}
           >
-            Discard
+            {t("common.discard")}
           </Button>
         </div>
       )}

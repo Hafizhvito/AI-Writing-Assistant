@@ -3,19 +3,10 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Trash2, FileText } from "lucide-react";
 import { useEditorStore } from "@/store/editorStore";
+import { useLocaleStore } from "@/store/localeStore";
+import { useTranslation } from "@/hooks/useTranslation";
+import { formatRelativeTime } from "@/lib/i18n/translations";
 import type { DraftSnapshot } from "@/types";
-
-function formatRelativeTime(timestamp: number): string {
-  const diffMs = Date.now() - timestamp;
-  const diffSec = Math.floor(diffMs / 1000);
-  if (diffSec < 60) return "just now";
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  const diffDay = Math.floor(diffHr / 24);
-  return `${diffDay}d ago`;
-}
 
 function getPreview(text: string): string {
   const plain = text.replace(/\s+/g, " ").trim();
@@ -23,6 +14,8 @@ function getPreview(text: string): string {
 }
 
 export function Sidebar() {
+  const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -31,6 +24,8 @@ export function Sidebar() {
   const snapshots = useEditorStore((s) => s.snapshots);
   const loadDraftById = useEditorStore((s) => s.loadDraftById);
   const deleteSnapshot = useEditorStore((s) => s.deleteSnapshot);
+
+  const displayTitle = (title: string) => title || t("common.untitled");
 
   const snapshotItems: DraftSnapshot[] = snapshots.filter((s) => s.isSnapshot);
 
@@ -42,7 +37,7 @@ export function Sidebar() {
       >
         <button
           onClick={() => setCollapsed(false)}
-          aria-label="Expand sidebar"
+          aria-label={t("sidebar.expand")}
           className="p-2 rounded-md text-muted hover:text-primary hover:bg-hover transition-colors duration-150"
         >
           <ChevronRight size={16} aria-hidden="true" />
@@ -62,11 +57,11 @@ export function Sidebar() {
       {/* Header row */}
       <div className="flex items-center justify-between px-4 py-3 shrink-0">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted select-none">
-          Drafts
+          {t("sidebar.drafts")}
         </span>
         <button
           onClick={() => setCollapsed(true)}
-          aria-label="Collapse sidebar"
+          aria-label={t("sidebar.collapse")}
           className="p-1 rounded text-muted hover:text-primary hover:bg-hover transition-colors duration-150"
         >
           <ChevronLeft size={15} aria-hidden="true" />
@@ -78,10 +73,10 @@ export function Sidebar() {
         <div className="rounded-md px-3 py-2.5 bg-accent-light border border-accent/20">
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-medium text-primary truncate">
-              {documentTitle || "Untitled"}
+              {displayTitle(documentTitle)}
             </span>
             <span className="text-[10px] font-medium text-accent shrink-0 bg-accent/10 px-1.5 py-0.5 rounded-full">
-              Auto-saved
+              {t("sidebar.autoSaved")}
             </span>
           </div>
           {text && (
@@ -98,7 +93,7 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto px-3 py-1">
         {snapshotItems.length === 0 ? (
           <p className="text-xs text-muted text-center mt-6 select-none">
-            Press ⌘S to save a snapshot
+            {t("sidebar.emptySnapshots")}
           </p>
         ) : (
           <ul className="space-y-1">
@@ -115,10 +110,10 @@ export function Sidebar() {
                 >
                   <div className="flex items-center justify-between gap-1 pr-5">
                     <span className="text-sm font-medium text-primary truncate">
-                      {snap.title || "Snapshot"}
+                      {snap.title || t("common.snapshot")}
                     </span>
                     <span className="text-[10px] text-muted shrink-0">
-                      {formatRelativeTime(snap.createdAt)}
+                      {formatRelativeTime(locale, snap.createdAt)}
                     </span>
                   </div>
                   {snap.text && (
@@ -134,7 +129,9 @@ export function Sidebar() {
                       e.stopPropagation();
                       deleteSnapshot(snap.id);
                     }}
-                    aria-label={`Delete snapshot "${snap.title}"`}
+                    aria-label={t("sidebar.deleteSnapshot", {
+                      title: snap.title || t("common.snapshot"),
+                    })}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-muted hover:text-danger hover:bg-danger/10 transition-colors duration-100"
                   >
                     <Trash2 size={13} aria-hidden="true" />

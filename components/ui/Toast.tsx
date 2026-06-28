@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useToastStore, type Toast, type ToastType } from "@/store/toastStore";
+import { useTranslation } from "@/hooks/useTranslation";
 import { ANIMATIONS } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
@@ -12,14 +13,15 @@ const borderColorMap: Record<ToastType, string> = {
   info: "border-l-accent",
 };
 
-const labelMap: Record<ToastType, string> = {
-  success: "Success",
-  error: "Error",
-  info: "Info",
-};
-
 function ToastItem({ toast }: { toast: Toast }) {
+  const { t } = useTranslation();
   const removeToast = useToastStore((s) => s.removeToast);
+
+  const labelMap: Record<ToastType, string> = {
+    success: t("toast.success"),
+    error: t("toast.error"),
+    info: t("toast.info"),
+  };
 
   return (
     <motion.div
@@ -45,7 +47,7 @@ function ToastItem({ toast }: { toast: Toast }) {
         </p>
       </div>
       <button
-        aria-label="Dismiss notification"
+        aria-label={t("a11y.dismissNotification")}
         onClick={() => removeToast(toast.id)}
         className={cn(
           "shrink-0 mt-0.5 rounded p-0.5",
@@ -62,11 +64,12 @@ function ToastItem({ toast }: { toast: Toast }) {
 }
 
 export function ToastContainer() {
+  const { t } = useTranslation();
   const toasts = useToastStore((s) => s.toasts);
 
   return (
     <div
-      aria-label="Notifications"
+      aria-label={t("a11y.notifications")}
       className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 items-end"
     >
       <AnimatePresence mode="popLayout" initial={false}>

@@ -3,17 +3,18 @@
 import { motion } from "framer-motion";
 import { X, CheckCircle2, AlertCircle } from "lucide-react";
 import { useEditorStore } from "@/store/editorStore";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ANIMATIONS, REDUCED_MOTION_TRANSITION } from "@/lib/animations";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import type { GrammarIssueType } from "@/types";
 
-const TYPE_BADGE: Record<GrammarIssueType, { label: string; className: string }> = {
-  grammar: { label: "Grammar", className: "bg-[var(--accent-light)] text-[var(--accent-text)]" },
-  spelling: { label: "Spelling", className: "bg-[var(--danger-light)] text-[var(--danger)]" },
-  style: { label: "Style", className: "bg-[var(--bg-hover)] text-[var(--text-secondary)]" },
-  punctuation: { label: "Punctuation", className: "bg-[var(--success-light)] text-[var(--success)]" },
+const TYPE_BADGE_CLASS: Record<GrammarIssueType, string> = {
+  grammar: "bg-[var(--accent-light)] text-[var(--accent-text)]",
+  spelling: "bg-[var(--danger-light)] text-[var(--danger)]",
+  style: "bg-[var(--bg-hover)] text-[var(--text-secondary)]",
+  punctuation: "bg-[var(--success-light)] text-[var(--success)]",
 };
 
 function SkeletonCard() {
@@ -35,6 +36,7 @@ function SkeletonCard() {
 }
 
 export function GrammarPanel() {
+  const { t } = useTranslation();
   const {
     grammarIssues,
     isLoading,
@@ -61,7 +63,7 @@ export function GrammarPanel() {
       transition={transition}
       style={{ width: 340, minWidth: 340 }}
       className="flex flex-col h-full border-l border-[var(--border-default)] bg-[var(--bg-surface)] overflow-hidden"
-      aria-label="Grammar Check panel"
+      aria-label={t("grammar.panelLabel")}
     >
       {/* Header */}
       <div
@@ -73,7 +75,7 @@ export function GrammarPanel() {
             className="text-sm font-semibold"
             style={{ color: "var(--text-primary)" }}
           >
-            Grammar Check
+            {t("grammar.title")}
           </h2>
           {!showSkeleton && grammarIssues.length > 0 && (
             <span
@@ -83,7 +85,7 @@ export function GrammarPanel() {
                 color: "var(--danger)",
                 minWidth: 20,
               }}
-              aria-label={`${grammarIssues.length} issues`}
+              aria-label={t("grammar.issuesCount", { n: grammarIssues.length })}
             >
               {grammarIssues.length}
             </span>
@@ -91,7 +93,7 @@ export function GrammarPanel() {
         </div>
         <button
           type="button"
-          aria-label="Close Grammar Check panel"
+          aria-label={t("grammar.closePanel")}
           onClick={() => setActivePanel(null)}
           className={cn(
             "rounded-md p-1 transition-colors duration-150",
@@ -109,7 +111,7 @@ export function GrammarPanel() {
         aria-atomic="true"
         className="sr-only"
       >
-        {showSkeleton ? "Checking grammar, please wait…" : ""}
+        {showSkeleton ? t("grammar.checking") : ""}
       </div>
 
       {/* Scrollable content */}
@@ -131,67 +133,64 @@ export function GrammarPanel() {
               className="text-sm font-medium"
               style={{ color: "var(--text-primary)" }}
             >
-              No issues found.
+              {t("grammar.noIssues")}
             </p>
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              Your writing looks great.
+              {t("grammar.looksGreat")}
             </p>
           </div>
         ) : (
-          grammarIssues.map((issue) => {
-            const badge = TYPE_BADGE[issue.type];
-            return (
-              <div
-                key={issue.id}
-                className="rounded-lg p-4 border border-[var(--border-default)]"
-                style={{ background: "var(--bg-primary)" }}
+          grammarIssues.map((issue) => (
+            <div
+              key={issue.id}
+              className="rounded-lg p-4 border border-[var(--border-default)]"
+              style={{ background: "var(--bg-primary)" }}
+            >
+              {/* Type badge */}
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold mb-3",
+                  TYPE_BADGE_CLASS[issue.type]
+                )}
               >
-                {/* Type badge */}
+                {t(`grammar.types.${issue.type}`)}
+              </span>
+
+              {/* Original (strikethrough) */}
+              <p className="text-sm mb-1" style={{ color: "var(--text-secondary)" }}>
                 <span
-                  className={cn(
-                    "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold mb-3",
-                    badge.className
-                  )}
+                  className="line-through"
+                  style={{ color: "var(--danger)" }}
                 >
-                  {badge.label}
+                  {issue.original}
                 </span>
+              </p>
 
-                {/* Original (strikethrough) */}
-                <p className="text-sm mb-1" style={{ color: "var(--text-secondary)" }}>
-                  <span
-                    className="line-through"
-                    style={{ color: "var(--danger)" }}
-                  >
-                    {issue.original}
-                  </span>
-                </p>
+              {/* Suggestion */}
+              <p
+                className="text-sm font-medium mb-2"
+                style={{ color: "var(--success)" }}
+              >
+                {issue.suggestion}
+              </p>
 
-                {/* Suggestion */}
-                <p
-                  className="text-sm font-medium mb-2"
-                  style={{ color: "var(--success)" }}
-                >
-                  {issue.suggestion}
-                </p>
+              {/* Explanation */}
+              <p
+                className="text-xs mb-3 leading-relaxed"
+                style={{ color: "var(--text-muted)" }}
+              >
+                {issue.explanation}
+              </p>
 
-                {/* Explanation */}
-                <p
-                  className="text-xs mb-3 leading-relaxed"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  {issue.explanation}
-                </p>
-
-                <Button
-                  variant="ghost"
-                  onClick={() => applyGrammarFix(issue.id)}
-                  className="text-xs px-2.5 py-1.5 h-auto"
-                >
-                  Apply
-                </Button>
-              </div>
-            );
-          })
+              <Button
+                variant="ghost"
+                onClick={() => applyGrammarFix(issue.id)}
+                className="text-xs px-2.5 py-1.5 h-auto"
+              >
+                {t("common.apply")}
+              </Button>
+            </div>
+          ))
         )}
       </div>
 
@@ -207,7 +206,7 @@ export function GrammarPanel() {
             onClick={applyAllGrammarFixes}
           >
             <AlertCircle size={14} aria-hidden />
-            Apply All ({grammarIssues.length})
+            {t("grammar.applyAll", { n: grammarIssues.length })}
           </Button>
         </div>
       )}

@@ -1,8 +1,13 @@
+"use client";
+
+import { useTranslation } from "@/hooks/useTranslation";
+
 interface WordCountProps {
   text: string;
 }
 
 export default function WordCount({ text }: WordCountProps) {
+  const { t } = useTranslation();
   const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
   const chars = text.length;
   const readingMins = Math.max(1, Math.ceil(words / 200));
@@ -16,19 +21,17 @@ export default function WordCount({ text }: WordCountProps) {
         <span className="font-medium" style={{ color: "var(--text-secondary)" }}>
           {words.toLocaleString()}
         </span>{" "}
-        {words === 1 ? "word" : "words"}
+        {words === 1 ? t("common.word") : t("common.words")}
       </span>
       <span style={{ color: "var(--border-default)" }}>|</span>
       <span>
         <span className="font-medium" style={{ color: "var(--text-secondary)" }}>
           {chars.toLocaleString()}
         </span>{" "}
-        {chars === 1 ? "char" : "chars"}
+        {chars === 1 ? t("common.char") : t("common.chars")}
       </span>
       <span style={{ color: "var(--border-default)" }}>|</span>
-      <span>
-        {readingMins} min read
-      </span>
+      <span>{t("common.minRead", { n: readingMins })}</span>
     </div>
   );
 }

@@ -1,25 +1,26 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { Keyboard, X } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "./Button";
 
 interface Shortcut {
   keys: string[];
-  description: string;
+  descriptionKey: string;
 }
 
-const SHORTCUTS: Shortcut[] = [
-  { keys: ["⌘", "K"], description: "Open command palette" },
-  { keys: ["⌘", "I"], description: "Improve Writing" },
-  { keys: ["⌘", "G"], description: "Grammar Check" },
-  { keys: ["⌘", "J"], description: "Summarize" },
-  { keys: ["⌘", "E"], description: "Expand" },
-  { keys: ["⌘", "R"], description: "Rewrite with current tone" },
-  { keys: ["⌘", "D"], description: "Toggle dark / light mode" },
-  { keys: ["⌘", "S"], description: "Save snapshot" },
-  { keys: ["Esc"], description: "Close any open panel / modal" },
-  { keys: ["?"], description: "Open shortcuts cheatsheet" },
+const SHORTCUT_DEFS: Shortcut[] = [
+  { keys: ["⌘", "K"], descriptionKey: "shortcuts.items.palette" },
+  { keys: ["⌘", "I"], descriptionKey: "shortcuts.items.improve" },
+  { keys: ["⌘", "G"], descriptionKey: "shortcuts.items.grammar" },
+  { keys: ["⌘", "J"], descriptionKey: "shortcuts.items.summarize" },
+  { keys: ["⌘", "E"], descriptionKey: "shortcuts.items.expand" },
+  { keys: ["⌘", "R"], descriptionKey: "shortcuts.items.rewrite" },
+  { keys: ["⌘", "D"], descriptionKey: "shortcuts.items.theme" },
+  { keys: ["⌘", "S"], descriptionKey: "shortcuts.items.snapshot" },
+  { keys: ["Esc"], descriptionKey: "shortcuts.items.close" },
+  { keys: ["?"], descriptionKey: "shortcuts.items.cheatsheet" },
 ];
 
 interface ShortcutsModalProps {
@@ -28,8 +29,18 @@ interface ShortcutsModalProps {
 }
 
 export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
+  const { t } = useTranslation();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+  const shortcuts = useMemo(
+    () =>
+      SHORTCUT_DEFS.map(({ keys, descriptionKey }) => ({
+        keys,
+        description: t(descriptionKey),
+      })),
+    [t]
+  );
 
   useEffect(() => {
     if (open) {
@@ -92,7 +103,7 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
           <div className="flex items-center gap-2">
             <Keyboard className="h-4 w-4 text-[var(--text-muted)]" />
             <h2 id="shortcuts-title" className="text-sm font-semibold text-[var(--text-primary)]">
-              Keyboard Shortcuts
+              {t("shortcuts.title")}
             </h2>
           </div>
           <Button
@@ -100,7 +111,7 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
             variant="ghost"
             className="h-auto p-1"
             onClick={onClose}
-            aria-label="Close shortcuts"
+            aria-label={t("shortcuts.close")}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -108,7 +119,7 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
 
         {/* Shortcuts grid */}
         <div className="grid grid-cols-1 gap-x-8 p-5 sm:grid-cols-2">
-          {SHORTCUTS.map((shortcut, i) => (
+          {shortcuts.map((shortcut, i) => (
             <div
               key={i}
               className="flex items-center justify-between border-b border-[var(--border-default)] py-2.5 last:border-0 sm:[&:nth-last-child(2)]:border-0"
@@ -132,7 +143,7 @@ export function ShortcutsModal({ open, onClose }: ShortcutsModalProps) {
 
         {/* Footer */}
         <div className="border-t border-[var(--border-default)] px-5 py-3 text-[11px] text-[var(--text-muted)]">
-          On macOS use ⌘ · On Windows / Linux use Ctrl
+          {t("shortcuts.platformNote")}
         </div>
       </div>
     </div>

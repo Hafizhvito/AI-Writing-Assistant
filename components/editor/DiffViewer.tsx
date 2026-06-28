@@ -1,4 +1,7 @@
+"use client";
+
 import { wordDiff } from "@/lib/diff";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface DiffViewerProps {
   original: string;
@@ -6,6 +9,7 @@ interface DiffViewerProps {
 }
 
 export default function DiffViewer({ original, revised }: DiffViewerProps) {
+  const { t } = useTranslation();
   const parts = wordDiff(original, revised);
 
   const originalNodes = parts
@@ -60,7 +64,7 @@ export default function DiffViewer({ original, revised }: DiffViewerProps) {
           className="text-xs font-semibold mb-2 uppercase tracking-wide"
           style={{ color: "var(--text-muted)" }}
         >
-          Original
+          {t("diff.original")}
         </p>
         <p style={{ color: "var(--text-primary)" }}>{originalNodes}</p>
       </div>
@@ -76,7 +80,7 @@ export default function DiffViewer({ original, revised }: DiffViewerProps) {
           className="text-xs font-semibold mb-2 uppercase tracking-wide"
           style={{ color: "var(--text-muted)" }}
         >
-          Revised
+          {t("diff.revised")}
         </p>
         <p style={{ color: "var(--text-primary)" }}>{revisedNodes}</p>
       </div>

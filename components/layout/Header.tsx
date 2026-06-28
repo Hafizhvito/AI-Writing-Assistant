@@ -3,11 +3,14 @@
 import { useRef, useState, useEffect, KeyboardEvent } from "react";
 import { Pencil } from "lucide-react";
 import { useEditorStore } from "@/store/editorStore";
+import { useTranslation } from "@/hooks/useTranslation";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ExportMenu } from "@/components/ui/ExportMenu";
 import WordCount from "@/components/editor/WordCount";
 
 export function Header() {
+  const { t } = useTranslation();
   const documentTitle = useEditorStore((s) => s.documentTitle);
   const setDocumentTitle = useEditorStore((s) => s.setDocumentTitle);
   const text = useEditorStore((s) => s.text);
@@ -16,6 +19,8 @@ export function Header() {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(documentTitle);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const displayTitle = (title: string) => title || t("common.untitled");
 
   useEffect(() => {
     if (editing) {
@@ -26,7 +31,7 @@ export function Header() {
 
   function commitEdit() {
     const trimmed = draft.trim();
-    setDocumentTitle(trimmed || "Untitled");
+    setDocumentTitle(trimmed || t("common.untitled"));
     setEditing(false);
   }
 
@@ -68,15 +73,15 @@ export function Header() {
             onBlur={commitEdit}
             onKeyDown={handleKeyDown}
             className="text-sm font-medium text-primary bg-transparent border-b border-accent outline-none text-center w-48 max-w-xs px-1"
-            aria-label="Document title"
+            aria-label={t("header.documentTitle")}
           />
         ) : (
           <button
             onClick={() => setEditing(true)}
             className="text-sm font-medium text-primary hover:text-accent transition-colors duration-150 rounded px-2 py-0.5 hover:bg-hover max-w-xs truncate"
-            title="Click to edit title"
+            title={t("header.editTitle")}
           >
-            {documentTitle}
+            {displayTitle(documentTitle)}
           </button>
         )}
       </div>
@@ -85,11 +90,16 @@ export function Header() {
       <div className="flex items-center gap-2 shrink-0">
         {selectionWords !== null && (
           <span className="text-xs font-medium bg-accent-light text-accent px-2 py-0.5 rounded-full">
-            {selectionWords} {selectionWords === 1 ? "word" : "words"} selected
+            {t("header.wordsSelected", {
+              n: selectionWords,
+              unit:
+                selectionWords === 1 ? t("common.word") : t("common.words"),
+            })}
           </span>
         )}
         <WordCount text={text} />
         <ExportMenu />
+        <LanguageToggle />
         <ThemeToggle />
       </div>
     </header>

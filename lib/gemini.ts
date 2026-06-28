@@ -1,7 +1,7 @@
 import type { Tone } from "@/types";
 
 const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 export const SYSTEM_PROMPTS = {
   improve: `You are a world-class editor who has worked with bestselling authors and top publications. Your job is to improve the user's writing to make it clearer, more engaging, and more powerful — without changing their voice or meaning. Fix awkward phrasing, passive voice, redundancy, and weak word choices. Return ONLY the improved text. No explanations, no preamble, no quotation marks.`,

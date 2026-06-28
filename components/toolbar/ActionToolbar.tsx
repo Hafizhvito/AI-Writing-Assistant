@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   SpellCheck,
@@ -10,6 +11,7 @@ import {
   Repeat2,
 } from "lucide-react";
 import { useEditorStore } from "@/store/editorStore";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ANIMATIONS, REDUCED_MOTION_TRANSITION } from "@/lib/animations";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -18,18 +20,18 @@ import type { AiAction } from "@/types";
 
 interface ActionConfig {
   action: AiAction;
-  label: string;
+  labelKey: string;
   icon: React.ElementType;
   shortcut: string;
 }
 
-const ACTIONS: ActionConfig[] = [
-  { action: "improve", label: "Improve", icon: Wand2, shortcut: "⌘I" },
-  { action: "grammar", label: "Grammar", icon: SpellCheck, shortcut: "⌘G" },
-  { action: "summarize", label: "Summarize", icon: FileText, shortcut: "⌘J" },
-  { action: "expand", label: "Expand", icon: Maximize2, shortcut: "⌘E" },
-  { action: "rewrite", label: "Rewrite", icon: RefreshCw, shortcut: "⌘R" },
-  { action: "rephrase", label: "Rephrase", icon: Repeat2, shortcut: "" },
+const ACTION_DEFS: ActionConfig[] = [
+  { action: "improve", labelKey: "actions.improve", icon: Wand2, shortcut: "⌘I" },
+  { action: "grammar", labelKey: "actions.grammar", icon: SpellCheck, shortcut: "⌘G" },
+  { action: "summarize", labelKey: "actions.summarize", icon: FileText, shortcut: "⌘J" },
+  { action: "expand", labelKey: "actions.expand", icon: Maximize2, shortcut: "⌘E" },
+  { action: "rewrite", labelKey: "actions.rewrite", icon: RefreshCw, shortcut: "⌘R" },
+  { action: "rephrase", labelKey: "actions.rephrase", icon: Repeat2, shortcut: "" },
 ];
 
 interface ActionToolbarProps {
@@ -37,9 +39,21 @@ interface ActionToolbarProps {
 }
 
 export function ActionToolbar({ hasSelection }: ActionToolbarProps) {
+  const { t } = useTranslation();
   const { text, isLoading, loadingAction, runAiAction, selection } =
     useEditorStore();
   const reducedMotion = useReducedMotion();
+
+  const actions = useMemo(
+    () =>
+      ACTION_DEFS.map(({ action, labelKey, icon, shortcut }) => ({
+        action,
+        label: t(labelKey),
+        icon,
+        shortcut,
+      })),
+    [t]
+  );
 
   const hasActiveSelection =
     hasSelection ?? !!(selection && selection.start !== selection.end);
@@ -67,9 +81,9 @@ export function ActionToolbar({ hasSelection }: ActionToolbarProps) {
             "shadow-lg"
           )}
           role="toolbar"
-          aria-label="AI actions"
+          aria-label={t("a11y.aiActions")}
         >
-          {ACTIONS.map(({ action, label, icon: Icon, shortcut }) => {
+          {actions.map(({ action, label, icon: Icon, shortcut }) => {
             const actionLoading = isLoading && loadingAction === action;
 
             return (

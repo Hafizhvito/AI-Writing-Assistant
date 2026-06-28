@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Download,
   Copy,
@@ -10,6 +10,7 @@ import {
   Check,
 } from "lucide-react";
 import { useEditorStore } from "@/store/editorStore";
+import { useTranslation } from "@/hooks/useTranslation";
 import { toMarkdown, toPlainText, toHtml, downloadFile } from "@/lib/markdown";
 
 interface MenuItem {
@@ -20,6 +21,7 @@ interface MenuItem {
 }
 
 export function ExportMenu() {
+  const { t } = useTranslation();
   const text = useEditorStore((s) => s.text);
   const documentTitle = useEditorStore((s) => s.documentTitle);
 
@@ -45,39 +47,42 @@ export function ExportMenu() {
     setOpen(false);
   }
 
-  const items: MenuItem[] = [
-    {
-      id: "export-md",
-      label: "Export as .md",
-      icon: <Download size={15} aria-hidden="true" />,
-      action: () => {
-        downloadFile(
-          toMarkdown(text, documentTitle),
-          `${documentTitle.replace(/\s+/g, "-").toLowerCase()}.md`,
-          "text/markdown"
-        );
-        setOpen(false);
+  const items: MenuItem[] = useMemo(
+    () => [
+      {
+        id: "export-md",
+        label: t("export.asMd"),
+        icon: <Download size={15} aria-hidden="true" />,
+        action: () => {
+          downloadFile(
+            toMarkdown(text, documentTitle),
+            `${documentTitle.replace(/\s+/g, "-").toLowerCase()}.md`,
+            "text/markdown"
+          );
+          setOpen(false);
+        },
       },
-    },
-    {
-      id: "copy-md",
-      label: "Copy Markdown",
-      icon: <FileText size={15} aria-hidden="true" />,
-      action: () => copyWithFeedback("copy-md", toMarkdown(text, documentTitle)),
-    },
-    {
-      id: "copy-plain",
-      label: "Copy Plain Text",
-      icon: <Copy size={15} aria-hidden="true" />,
-      action: () => copyWithFeedback("copy-plain", toPlainText(text)),
-    },
-    {
-      id: "copy-html",
-      label: "Copy HTML",
-      icon: <Code2 size={15} aria-hidden="true" />,
-      action: () => copyWithFeedback("copy-html", toHtml(text, documentTitle)),
-    },
-  ];
+      {
+        id: "copy-md",
+        label: t("export.copyMd"),
+        icon: <FileText size={15} aria-hidden="true" />,
+        action: () => copyWithFeedback("copy-md", toMarkdown(text, documentTitle)),
+      },
+      {
+        id: "copy-plain",
+        label: t("export.copyPlain"),
+        icon: <Copy size={15} aria-hidden="true" />,
+        action: () => copyWithFeedback("copy-plain", toPlainText(text)),
+      },
+      {
+        id: "copy-html",
+        label: t("export.copyHtml"),
+        icon: <Code2 size={15} aria-hidden="true" />,
+        action: () => copyWithFeedback("copy-html", toHtml(text, documentTitle)),
+      },
+    ],
+    [t, text, documentTitle]
+  );
 
   return (
     <div className="relative" ref={menuRef}>
@@ -88,7 +93,7 @@ export function ExportMenu() {
         className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-secondary hover:text-primary hover:bg-hover transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <Download size={15} aria-hidden="true" />
-        Export
+        {t("common.export")}
         <ChevronDown
           size={13}
           className={`transition-transform duration-150 ${open ? "rotate-180" : ""}`}
@@ -116,7 +121,7 @@ export function ExportMenu() {
                 )}
               </span>
               {copied === item.id ? (
-                <span className="text-success font-medium">Copied!</span>
+                <span className="text-success font-medium">{t("common.copied")}</span>
               ) : (
                 item.label
               )}

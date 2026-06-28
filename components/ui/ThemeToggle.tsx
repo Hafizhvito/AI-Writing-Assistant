@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "theme";
@@ -21,6 +22,7 @@ function applyTheme(theme: "light" | "dark") {
 }
 
 export function ThemeToggle({ className }: { className?: string }) {
+  const { t } = useTranslation();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
 
@@ -40,7 +42,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   if (!mounted) {
     return (
       <button
-        aria-label="Toggle theme"
+        aria-label={t("theme.toggle")}
         className={cn(
           "rounded-md p-2 text-[var(--text-secondary)]",
           "opacity-0",
@@ -53,7 +55,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   return (
     <button
-      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      aria-label={t("theme.toggle")}
       onClick={toggle}
       className={cn(
         "inline-flex items-center justify-center rounded-md p-2",

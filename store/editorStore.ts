@@ -16,6 +16,8 @@ import {
   deleteSnapshot as storageDeleteSnapshot,
 } from "@/lib/storage";
 import { callAiApi } from "@/lib/api";
+import { translate } from "@/lib/i18n/translations";
+import { useLocaleStore } from "@/store/localeStore";
 
 interface EditorState {
   text: string;
@@ -137,7 +139,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const targetText = getAiTargetText();
 
     if (targetText.trim().length < 10) {
-      set({ aiError: "Please write at least 10 characters before using AI." });
+      const locale = useLocaleStore.getState().locale;
+      set({ aiError: translate(locale, "errors.textTooShort") });
       return;
     }
 
@@ -169,7 +172,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         });
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Something went wrong. Try again.";
+      const locale = useLocaleStore.getState().locale;
+      const message =
+        err instanceof Error
+          ? err.message
+          : translate(locale, "errors.generic");
       set({ aiError: message });
     } finally {
       set({ isLoading: false, loadingAction: null });

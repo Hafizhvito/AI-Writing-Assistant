@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Wand2, X } from "lucide-react";
 
@@ -16,20 +16,12 @@ import {
 } from "@/components/ui";
 
 import { useEditorStore } from "@/store/editorStore";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { ANIMATIONS, REDUCED_MOTION_TRANSITION } from "@/lib/animations";
 import type { AiAction } from "@/types";
-
-const AI_ACTIONS: { action: AiAction; label: string }[] = [
-  { action: "improve", label: "Improve Writing" },
-  { action: "grammar", label: "Grammar Check" },
-  { action: "summarize", label: "Summarize" },
-  { action: "expand", label: "Expand" },
-  { action: "rewrite", label: "Rewrite" },
-  { action: "rephrase", label: "Rephrase" },
-];
 
 function applyThemeToggle() {
   const current = document.documentElement.getAttribute("data-theme");
@@ -43,6 +35,7 @@ function applyThemeToggle() {
 }
 
 export default function Home() {
+  const { t } = useTranslation();
   const {
     text,
     documentTitle,
@@ -63,6 +56,21 @@ export default function Home() {
   const { addToast } = useToast();
   const reducedMotion = useReducedMotion();
 
+  const aiActions = useMemo(
+    () =>
+      (
+        [
+          { action: "improve" as AiAction, labelKey: "actions.improveFull" },
+          { action: "grammar" as AiAction, labelKey: "actions.grammarFull" },
+          { action: "summarize" as AiAction, labelKey: "actions.summarize" },
+          { action: "expand" as AiAction, labelKey: "actions.expand" },
+          { action: "rewrite" as AiAction, labelKey: "actions.rewrite" },
+          { action: "rephrase" as AiAction, labelKey: "actions.rephrase" },
+        ] as const
+      ).map(({ action, labelKey }) => ({ action, label: t(labelKey) })),
+    [t]
+  );
+
   // Hydrate from localStorage on mount
   useEffect(() => {
     hydrateFromStorage();
@@ -73,8 +81,8 @@ export default function Home() {
 
   const handleSnapshot = useCallback(() => {
     createSnapshot();
-    addToast("Snapshot saved", "success");
-  }, [createSnapshot, addToast]);
+    addToast(t("toast.snapshotSaved"), "success");
+  }, [createSnapshot, addToast, t]);
 
   const handleClose = useCallback(() => {
     if (paletteOpen) {
@@ -153,7 +161,7 @@ export default function Home() {
         className="sr-only"
         role="status"
       >
-        {isLoading ? "AI is processing your request…" : ""}
+        {isLoading ? t("loading.aiProcessing") : ""}
       </div>
 
       {/* Header height spacer */}
@@ -170,7 +178,7 @@ export default function Home() {
         {/* Editor column — scrollable */}
         <main
           id="main-content"
-          aria-label="Document editor"
+          aria-label={t("a11y.mainEditor")}
           className="flex-1 min-w-0 overflow-y-auto"
         >
           <Editor />
@@ -257,7 +265,7 @@ export default function Home() {
         {/* FAB */}
         <button
           type="button"
-          aria-label="Open AI actions"
+          aria-label={t("mobile.openAiActions")}
           onClick={() => setMobileActionOpen(true)}
           disabled={isLoading}
           className="fixed bottom-6 right-5 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-accent text-white shadow-lg hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-opacity duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -297,7 +305,7 @@ export default function Home() {
                 className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-[var(--border-default)] bg-[var(--bg-surface)] px-4 pb-10 pt-3"
                 role="dialog"
                 aria-modal="true"
-                aria-label="AI actions"
+                aria-label={t("a11y.aiActions")}
               >
                 {/* Drag handle */}
                 <div className="flex justify-center pb-3">
@@ -306,11 +314,11 @@ export default function Home() {
 
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-                    AI Actions
+                    {t("mobile.aiActions")}
                   </h2>
                   <button
                     type="button"
-                    aria-label="Close AI actions"
+                    aria-label={t("mobile.closeAiActions")}
                     onClick={() => setMobileActionOpen(false)}
                     className="rounded-md p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
@@ -319,7 +327,7 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  {AI_ACTIONS.map(({ action, label }) => (
+                  {aiActions.map(({ action, label }) => (
                     <button
                       key={action}
                       type="button"

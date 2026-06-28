@@ -6,3 +6,4 @@ export { ToastContainer, useToast } from "./Toast";
 export { CommandPalette } from "./CommandPalette";
 export { ShortcutsModal } from "./ShortcutsModal";
 export { ExportMenu } from "./ExportMenu";
+export { LanguageToggle } from "./LanguageToggle";

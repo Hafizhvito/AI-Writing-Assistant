@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Wand2,
@@ -17,114 +17,21 @@ import {
   X,
   Search,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
+
+type GroupKey = "ai" | "document" | "view" | "navigation";
 
 interface Command {
   id: string;
   label: string;
-  group: string;
+  group: GroupKey;
   keywords: string[];
   shortcut?: string;
   icon: LucideIcon;
 }
 
-const GROUPS = ["AI Actions", "Document", "View", "Navigation"] as const;
-
-const ALL_COMMANDS: Command[] = [
-  {
-    id: "improve",
-    label: "Improve Writing",
-    group: "AI Actions",
-    keywords: ["ai", "enhance", "better", "polish", "fix"],
-    shortcut: "⌘I",
-    icon: Wand2,
-  },
-  {
-    id: "grammar",
-    label: "Grammar Check",
-    group: "AI Actions",
-    keywords: ["spelling", "punctuation", "errors", "check"],
-    shortcut: "⌘G",
-    icon: SpellCheck2,
-  },
-  {
-    id: "summarize",
-    label: "Summarize",
-    group: "AI Actions",
-    keywords: ["brief", "short", "summary", "condense", "shorten"],
-    shortcut: "⌘J",
-    icon: AlignLeft,
-  },
-  {
-    id: "expand",
-    label: "Expand",
-    group: "AI Actions",
-    keywords: ["lengthen", "elaborate", "detail", "more", "longer"],
-    shortcut: "⌘E",
-    icon: ChevronsUpDown,
-  },
-  {
-    id: "rewrite",
-    label: "Rewrite",
-    group: "AI Actions",
-    keywords: ["rework", "redo", "tone", "transform", "regenerate"],
-    shortcut: "⌘R",
-    icon: RefreshCw,
-  },
-  {
-    id: "rephrase",
-    label: "Rephrase",
-    group: "AI Actions",
-    keywords: ["paraphrase", "reword", "different", "wording", "alternative"],
-    icon: Quote,
-  },
-  {
-    id: "save-snapshot",
-    label: "Save Snapshot",
-    group: "Document",
-    keywords: ["save", "backup", "version", "history", "preserve"],
-    shortcut: "⌘S",
-    icon: Save,
-  },
-  {
-    id: "export",
-    label: "Export Document",
-    group: "Document",
-    keywords: ["download", "markdown", "copy", "file", "share"],
-    icon: Download,
-  },
-  {
-    id: "toggle-theme",
-    label: "Toggle Theme",
-    group: "View",
-    keywords: ["dark", "light", "mode", "color", "appearance", "theme"],
-    shortcut: "⌘D",
-    icon: SunMoon,
-  },
-  {
-    id: "toggle-diff",
-    label: "Toggle Diff View",
-    group: "View",
-    keywords: ["diff", "compare", "changes", "delta", "before", "after"],
-    icon: GitCompare,
-  },
-  {
-    id: "shortcuts",
-    label: "Keyboard Shortcuts",
-    group: "View",
-    keywords: ["help", "keys", "hotkeys", "cheatsheet", "reference"],
-    shortcut: "?",
-    icon: Keyboard,
-  },
-  {
-    id: "close-panel",
-    label: "Close Panel",
-    group: "Navigation",
-    keywords: ["close", "dismiss", "hide", "panel", "exit"],
-    shortcut: "Esc",
-    icon: X,
-  },
-];
+const GROUP_KEYS: GroupKey[] = ["ai", "document", "view", "navigation"];
 
 function fuzzyMatch(query: string, target: string): boolean {
   const q = query.toLowerCase().trim();
@@ -139,9 +46,9 @@ function fuzzyMatch(query: string, target: string): boolean {
   return qi === q.length;
 }
 
-function filterCommands(query: string): Command[] {
-  if (!query.trim()) return ALL_COMMANDS;
-  return ALL_COMMANDS.filter((cmd) => {
+function filterCommands(query: string, commands: Command[]): Command[] {
+  if (!query.trim()) return commands;
+  return commands.filter((cmd) => {
     const target = [cmd.label, ...cmd.keywords].join(" ");
     return fuzzyMatch(query, target);
   });
@@ -154,15 +61,126 @@ interface CommandPaletteProps {
 }
 
 export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [activeIdx, setActiveIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const filtered = filterCommands(query);
-  const grouped = GROUPS.map((group) => ({
+  const allCommands = useMemo<Command[]>(
+    () => [
+      {
+        id: "improve",
+        label: t("actions.improveFull"),
+        group: "ai",
+        keywords: ["ai", "enhance", "better", "polish", "fix", "improve", "writing"],
+        shortcut: "⌘I",
+        icon: Wand2,
+      },
+      {
+        id: "grammar",
+        label: t("actions.grammarFull"),
+        group: "ai",
+        keywords: ["spelling", "punctuation", "errors", "check", "grammar"],
+        shortcut: "⌘G",
+        icon: SpellCheck2,
+      },
+      {
+        id: "summarize",
+        label: t("actions.summarize"),
+        group: "ai",
+        keywords: ["brief", "short", "summary", "condense", "shorten", "summarize"],
+        shortcut: "⌘J",
+        icon: AlignLeft,
+      },
+      {
+        id: "expand",
+        label: t("actions.expand"),
+        group: "ai",
+        keywords: ["lengthen", "elaborate", "detail", "more", "longer", "expand"],
+        shortcut: "⌘E",
+        icon: ChevronsUpDown,
+      },
+      {
+        id: "rewrite",
+        label: t("actions.rewrite"),
+        group: "ai",
+        keywords: ["rework", "redo", "tone", "transform", "regenerate", "rewrite"],
+        shortcut: "⌘R",
+        icon: RefreshCw,
+      },
+      {
+        id: "rephrase",
+        label: t("actions.rephrase"),
+        group: "ai",
+        keywords: ["paraphrase", "reword", "different", "wording", "alternative", "rephrase"],
+        icon: Quote,
+      },
+      {
+        id: "save-snapshot",
+        label: t("commandPalette.saveSnapshot"),
+        group: "document",
+        keywords: ["save", "backup", "version", "history", "preserve", "snapshot"],
+        shortcut: "⌘S",
+        icon: Save,
+      },
+      {
+        id: "export",
+        label: t("commandPalette.exportDocument"),
+        group: "document",
+        keywords: ["download", "markdown", "copy", "file", "share", "export"],
+        icon: Download,
+      },
+      {
+        id: "toggle-theme",
+        label: t("commandPalette.toggleTheme"),
+        group: "view",
+        keywords: ["dark", "light", "mode", "color", "appearance", "theme"],
+        shortcut: "⌘D",
+        icon: SunMoon,
+      },
+      {
+        id: "toggle-diff",
+        label: t("commandPalette.toggleDiff"),
+        group: "view",
+        keywords: ["diff", "compare", "changes", "delta", "before", "after"],
+        icon: GitCompare,
+      },
+      {
+        id: "shortcuts",
+        label: t("commandPalette.keyboardShortcuts"),
+        group: "view",
+        keywords: ["help", "keys", "hotkeys", "cheatsheet", "reference", "shortcuts"],
+        shortcut: "?",
+        icon: Keyboard,
+      },
+      {
+        id: "close-panel",
+        label: t("commandPalette.closePanel"),
+        group: "navigation",
+        keywords: ["close", "dismiss", "hide", "panel", "exit"],
+        shortcut: "Esc",
+        icon: X,
+      },
+    ],
+    [t]
+  );
+
+  const groupLabels = useMemo(
+    () => ({
+      ai: t("commandPalette.groups.ai"),
+      document: t("commandPalette.groups.document"),
+      view: t("commandPalette.groups.view"),
+      navigation: t("commandPalette.groups.navigation"),
+    }),
+    [t]
+  );
+
+  const filtered = filterCommands(query, allCommands);
+  const grouped = GROUP_KEYS.map((group) => ({
     group,
+    label: groupLabels[group],
     commands: filtered.filter((c) => c.group === group),
   })).filter((g) => g.commands.length > 0);
   const flatCommands = grouped.flatMap((g) => g.commands);
@@ -257,7 +275,7 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Command Palette"
+        aria-label={t("commandPalette.title")}
         className="w-full max-w-[560px] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-[var(--shadow-lg)]"
         onKeyDown={handleKeyDown}
       >
@@ -271,9 +289,9 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
             aria-expanded={true}
             aria-controls="command-palette-list"
             aria-autocomplete="list"
-            aria-label="Search commands"
+            aria-label={t("commandPalette.search")}
             className="flex-1 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-placeholder)] outline-none"
-            placeholder="Search commands…"
+            placeholder={t("commandPalette.placeholder")}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -289,13 +307,13 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
         <div ref={listRef} id="command-palette-list" className="max-h-[360px] overflow-y-auto py-1.5">
           {grouped.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
-              No commands found
+              {t("commandPalette.noResults")}
             </p>
           ) : (
-            grouped.map(({ group, commands }) => (
+            grouped.map(({ group, label, commands }) => (
               <div key={group}>
                 <p className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                  {group}
+                  {label}
                 </p>
                 {commands.map((cmd) => {
                   const idx = flatCommands.indexOf(cmd);
@@ -340,24 +358,9 @@ export function CommandPalette({ open, onClose, onCommand }: CommandPaletteProps
 
         {/* Footer hints */}
         <div className="flex items-center gap-4 border-t border-[var(--border-default)] px-4 py-2 text-[11px] text-[var(--text-muted)]">
-          <span className="flex items-center gap-1">
-            <kbd className="rounded border border-[var(--border-default)] bg-[var(--bg-overlay)] px-1 py-0.5">
-              ↑↓
-            </kbd>{" "}
-            navigate
-          </span>
-          <span className="flex items-center gap-1">
-            <kbd className="rounded border border-[var(--border-default)] bg-[var(--bg-overlay)] px-1 py-0.5">
-              ↵
-            </kbd>{" "}
-            select
-          </span>
-          <span className="flex items-center gap-1">
-            <kbd className="rounded border border-[var(--border-default)] bg-[var(--bg-overlay)] px-1 py-0.5">
-              Esc
-            </kbd>{" "}
-            close
-          </span>
+          <span>{t("commandPalette.footerNav")}</span>
+          <span>{t("commandPalette.footerEnter")}</span>
+          <span>{t("commandPalette.footerEsc")}</span>
         </div>
       </div>
     </div>

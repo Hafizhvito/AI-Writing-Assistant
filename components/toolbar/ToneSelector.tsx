@@ -1,33 +1,45 @@
 "use client";
 
+import { useMemo } from "react";
 import { useEditorStore } from "@/store/editorStore";
+import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 import type { Tone } from "@/types";
 
 interface ToneConfig {
   value: Tone;
-  label: string;
+  labelKey: string;
 }
 
-const TONES: ToneConfig[] = [
-  { value: "professional", label: "Professional" },
-  { value: "casual", label: "Casual" },
-  { value: "friendly", label: "Friendly" },
-  { value: "persuasive", label: "Persuasive" },
-  { value: "academic", label: "Academic" },
-  { value: "creative", label: "Creative" },
+const TONE_DEFS: ToneConfig[] = [
+  { value: "professional", labelKey: "tones.professional" },
+  { value: "casual", labelKey: "tones.casual" },
+  { value: "friendly", labelKey: "tones.friendly" },
+  { value: "persuasive", labelKey: "tones.persuasive" },
+  { value: "academic", labelKey: "tones.academic" },
+  { value: "creative", labelKey: "tones.creative" },
 ];
 
 export function ToneSelector() {
+  const { t } = useTranslation();
   const { selectedTone, setSelectedTone } = useEditorStore();
+
+  const tones = useMemo(
+    () =>
+      TONE_DEFS.map(({ value, labelKey }) => ({
+        value,
+        label: t(labelKey),
+      })),
+    [t]
+  );
 
   return (
     <div
       className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
       role="radiogroup"
-      aria-label="Writing tone"
+      aria-label={t("tones.ariaLabel")}
     >
-      {TONES.map(({ value, label }) => {
+      {tones.map(({ value, label }) => {
         const isSelected = selectedTone === value;
 
         return (

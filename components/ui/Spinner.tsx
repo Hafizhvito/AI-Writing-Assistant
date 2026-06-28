@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface SpinnerProps {
   size?: "sm" | "md";
@@ -8,9 +9,11 @@ interface SpinnerProps {
 }
 
 export function Spinner({ size = "md", className }: SpinnerProps) {
+  const { t } = useTranslation();
+
   return (
     <svg
-      aria-label="Loading"
+      aria-label={t("loading.ariaLabel")}
       role="status"
       className={cn(
         "animate-spin",

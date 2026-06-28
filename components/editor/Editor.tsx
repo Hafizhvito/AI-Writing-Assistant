@@ -2,8 +2,10 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import { useEditorStore } from "@/store/editorStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Editor() {
+  const { t } = useTranslation();
   const text = useEditorStore((s) => s.text);
   const setText = useEditorStore((s) => s.setText);
   const setSelection = useEditorStore((s) => s.setSelection);
@@ -37,8 +39,8 @@ export default function Editor() {
       onSelect={captureSelection}
       onKeyUp={captureSelection}
       onMouseUp={captureSelection}
-      aria-label="Document editor"
-      placeholder="Start writing, or press ⌘K for commands..."
+      aria-label={t("editor.ariaLabel")}
+      placeholder={t("editor.placeholder")}
       className="w-full max-w-[720px] mx-auto block resize-none overflow-hidden border-none outline-none bg-base text-primary px-6 py-8 min-h-[60vh] placeholder:text-muted"
       style={{ lineHeight: 1.8, fontSize: "1.0625rem" }}
     />
