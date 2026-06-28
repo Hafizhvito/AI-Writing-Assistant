@@ -37,7 +37,7 @@ export function Sidebar() {
   if (collapsed) {
     return (
       <aside
-        className="fixed left-0 top-[52px] bottom-0 z-40 flex flex-col items-center pt-3 pb-4 border-r border-border bg-surface"
+        className="hidden md:flex fixed left-0 top-[52px] bottom-0 z-40 flex-col items-center pt-3 pb-4 border-r border-border bg-surface"
         style={{ width: "48px" }}
       >
         <button
@@ -56,7 +56,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className="fixed left-0 top-[52px] bottom-0 z-40 flex flex-col border-r border-border bg-surface overflow-hidden"
+      className="hidden md:flex fixed left-0 top-[52px] bottom-0 z-40 flex-col border-r border-border bg-surface overflow-hidden"
       style={{ width: "240px" }}
     >
       {/* Header row */}

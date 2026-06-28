@@ -61,7 +61,7 @@ export function ActionToolbar({ hasSelection }: ActionToolbarProps) {
           transition={transition}
           className={cn(
             "fixed bottom-6 left-1/2 -translate-x-1/2 z-40",
-            "flex items-center gap-1 px-2 py-1.5",
+            "hidden md:flex items-center gap-1 px-2 py-1.5",
             "rounded-full",
             "bg-[var(--bg-surface)] border border-[var(--border-default)]",
             "shadow-lg"
